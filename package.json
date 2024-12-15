@@ -1,38 +1,24 @@
 {
   "name": "real-estate-aggregator",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "autoprefixer": "^10.4.19",
-    "express": "^4.19.2",
-    "next": "14.2.1",
-    "node-fetch": "^3.3.2",
-    "react": "^18.2.0",
-    "react-dom": "^18",
-    "redux": "^5.0.1",
-    "sqlite": "^5.1.1"
-  },
-  "devDependencies": {
-    "@reduxjs/toolkit": "^2.2.3",
-    "@types/express": "^4.17.21",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^20.12.7",
-    "@types/react": "^18.2.77",
-    "@types/react-dom": "^18.2.25",
-    "daisyui": "^4.10.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.1",
-    "jest": "^29.7.0",
-    "playwright": "^1.43.1",
-    "postcss": "^8",
-    "sqlite3": "^5.1.7",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "start": "concurrently \"yarn workspace frontend start\" \"yarn workspace backend start\"",
+    "start:dev": "NODE_ENV=development concurrently \"yarn workspace frontend dev\" \"yarn workspace backend dev\"",
+    "start:prod": "NODE_ENV=production concurrently \"yarn workspace frontend prod\" \"yarn workspace backend prod\"",
+    "start:test": "NODE_ENV=test concurrently \"yarn workspace frontend test\" \"yarn workspace backend test\"",
+    "build": "yarn workspace frontend build && yarn workspace backend build",
+    "test": "concurrently \"yarn workspace frontend test\" \"yarn workspace backend test\"",
+    "test:frontend": "yarn workspace frontend test",
+    "test:backend": "yarn workspace backend test",
+    "lint": "eslint 'frontend/**/*.ts' 'backend/**/*.ts' --fix",
+    "test:watch": "jest --watch",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write 'frontend/**/*.ts' 'backend/**/*.ts' --write"
   }
 }

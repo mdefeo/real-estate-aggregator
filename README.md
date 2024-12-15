@@ -1,83 +1,283 @@
 # Real Estate Aggregator
 
-Real Estate Aggregator is a web application built with Next.js that allows users to scrape property listings from various websites and display them in a unified interface.
+This project is a real estate aggregator application that scrapes property listings from other websites, stores them in a PostgreSQL database, and displays them on a user-friendly dashboard. The application is built using **React** for the frontend, **Next.js** for server-side rendering, **NestJS** (or **Express**) for the backend, **PostgreSQL** as the database, **Sequelize** for ORM, **Redis** for caching, and **Bull** for job queues.
 
-## Installation
+## Stack
 
-To install and run the project locally, follow these steps:
+- **Frontend**: React/Next.js, Material UI, Tailwind CSS
+- **Backend**: NestJS, Sequelize, PostgreSQL, Redis, Puppeteer, Bull (for job queues)
+- **Deployment**: Vercel (Frontend), Heroku (Backend)
 
-1. Clone the repository:
+## Features
 
-```bash
-git clone <repository-url>
+- **Real-time property listing aggregation** from multiple external sources.
+- **User-friendly dashboard** built with React, Next.js, and Material UI.
+- **Backend API** for data management and scraping, built using NestJS or Express.
+- **Seamless integration** with PostgreSQL to store property listings.
+- **Caching** with Redis for improved performance.
+- **Job queues** for handling scraping tasks in the background using Bull.
+
+## Project Structure
+
+```text
+/my-project
+  /frontend            # Frontend application
+  /backend             # Backend API
+  /tests               # Unit and integration tests
+  /public              # Public assets (images, fonts, etc.)
+  package.json         # Project metadata and dependencies
+  .gitignore           # Git ignore file
+  README.md            # Project documentation
 ```
 
-2. Navigate to the project directory:
+## Setup Instructions
+
+### Project Setup
+
+Clone the repository and initialize the project:
 
 ```bash
+git clone https://github.com/mdefeo/real-estate-aggregator
 cd real-estate-aggregator
+git init
 ```
 
-3. Install dependencies:
+Install parent-level modules:
 
 ```bash
-npm install
-# or
-yarn install
+yarn
 ```
 
-4. Start the development server:
+### Frontend Setup
+
+To set up the frontend, run the following command inside the frontend folder:
+
+#### Create a Next.js project
 
 ```bash
-npm run dev
-# or
-yarn dev
+cd frontend
+yarn create next-app . --typescript --use-npm
 ```
 
-5. Open your browser and visit http://localhost:3000 to view the application.
+#### Install Dependencies
 
-## Usage
+After setting up the Next.js project, install the necessary dependencies:
 
-1. Enter the URL of the website you want to scrape property listings from.
-2. Click the "Scrape" button to initiate the scraping process.
-3. Use the filters to refine the displayed listings.
-4. View the scraped property listings in the interface.
+```bash
+yarn add @mui/material @emotion/react @emotion/styled
+yarn add tailwindcss@latest postcss@latest autoprefixer@latest
+yarn add eslint eslint-define-config @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier prettier @next/eslint-plugin-next --dev
+```
 
-## Roadmap
+### Set Up Tailwind
 
-1. Add authentication and user accounts.
-2. Implement pagination for large datasets.
-3. Improve error handling and error messages.
-4. Add support for additional property listing websites.
-5. Enhance UI/UX with animations and transitions.
+```bash
+npx tailwindcss init -p
+```
 
-## Known Issues
+Update tailwind.config.js and postcss.config.js as needed.
 
-- Hydration error on initial UI mismatch during server-side rendering.
-- Potential issues with data consistency and reliability of scraped listings.
+### Backend Setup
 
-## Workarounds
+#### Install NestJS and Setup
 
-- To mitigate the hydration error, ensure consistency between server-rendered HTML and client-rendered components.
+Navigate to the backend folder and initialize a NestJS project:
 
-## Contributing
+```bash
+yarn add @nestjs/cli
+nest new backend --package-manager yarn --skip-git
+```
 
-Contributions are welcome! Feel free to submit bug reports, feature requests, or pull requests.
+#### Install Backend Dependencies
 
-1. Fork the repository.
-2. Create a new branch (git checkout -b feature/my-feature).
-3. Make your changes and commit them (git commit -am 'Add new feature').
-4. Push to the branch (git push origin feature/my-feature).
-5. Create a new Pull Request.
+Install the necessary backend dependencies:
 
-## Releases
+```bash
+yarn add express sequelize pg pg-hstore cors dotenv reflect-metadata
+yarn add @nestjs/common@latest @nestjs/core@latest @nestjs/platform-express@latest
+yarn add typescript@latest @typescript-eslint/eslint-plugin@latest reflect-metadata
+yarn add -D typescript ts-node @types/express @types/node eslint-define-config
+```
 
-v1.0.0 - Initial release with basic functionality.
+#### PostgreSQL Setup
 
-## License
+Create a new PostgreSQL user and database for the backend:
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+psql postgres
+```
 
-## Acknowledgements
+```sql
+CREATE USER your-user-here WITH PASSWORD 'your-password-here';
+CREATE DATABASE your-dev-db-name-here;
+CREATE DATABASE your-test-db-name-here;
+CREATE DATABASE your-prod-db-name-here;
 
-Special thanks to contributors and open-source libraries used in this project.
+GRANT ALL PRIVILEGES ON DATABASE your-dev-db-name-here TO your-user-here;
+GRANT ALL PRIVILEGES ON DATABASE your-test-db-name-here TO your-user-here;
+GRANT ALL PRIVILEGES ON DATABASE your-prod-db-name-here TO your-user-here;
+
+\q
+```
+
+#### Sequelize Setup
+
+Initialize Sequelize and generate models:
+
+```bash
+yarn sequelize init
+yarn sequelize model:generate --name Listing --attributes title:string,price:float,location:string
+```
+
+Run migration:
+
+```bash
+yarn sequelize db:migrate
+```
+
+#### Scraping and Queues Setup
+
+Install Puppeteer, Cheerio, Bull, and Redis for scraping and queues:
+
+```bash
+yarn add puppeteer cheerio axios
+yarn add bull ioredis
+yarn add -D @types/bull
+```
+
+#### Redis Setup
+
+Set up Redis caching and configure Redis connections:
+
+```tsx
+import Redis from 'ioredis';
+const redis = new Redis();
+redis.set('listing:123', JSON.stringify({ title: 'Listing 1', price: 100000 }));
+const cachedListing = await redis.get('listing:123');
+```
+
+### Environment Variables
+
+Create a .env file in both the frontend and backend folders to store the necessary environment variables.
+
+For the backend, you will need:
+
+```txt
+DATABASE_URL=postgres://DB_USER:DB_PASSWORD@localhost:5432/DB_NAME
+REDIS_HOST=localhost
+REDIS_PORT=6379
+JWT_SECRET=your_jwt_secret
+```
+
+For the frontend, you will need:
+
+```txt
+NEXT_PUBLIC_API_URL=http://localhost:5000/api
+```
+
+### Docker Setup
+
+#### Backend Dockerfile
+
+To build and run the backend in Docker, create a Dockerfile inside the backend folder:
+
+```dockerfile
+# Backend Dockerfile
+FROM node:22.12.0
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+EXPOSE 5000
+
+CMD ["yarn", "start"]
+```
+
+#### Frontend Dockerfile
+
+To build and run the frontend in Docker, create a Dockerfile inside the frontend folder:
+
+```dockerfile
+# Frontend Dockerfile
+FROM node:22.12.0
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+EXPOSE 3000
+
+CMD ["yarn", "start"]
+```
+
+#### Docker Compose
+
+At the parent level, create a docker-compose.yml file to orchestrate the frontend, backend, and database containers:
+
+```yaml
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgres://DB_USER:DB_PASSWORD@db:5432/DB_NAME
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: aggregator_user
+      POSTGRES_PASSWORD: sY1-kj5Zhe0yc_aom0ma
+      POSTGRES_DB: ra_aggregator_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+    driver: local
+```
+
+## Running the Project with Docker
+
+Run the application with Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+This will build and start the frontend, backend, PostgreSQL, and Redis containers. The frontend will be accessible at <http://localhost:3000>, and the backend at <http://localhost:5000>.

@@ -1,0 +1,31 @@
+# Backend Dockerfile
+FROM node:22.12.0
+
+WORKDIR /app
+
+# Copy the package.json and yarn.lock
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+# Copy the rest of the app
+COPY . .
+
+# Set environment variables for Docker build (if necessary)
+ARG DATABASE_URL
+ARG REDIS_HOST
+ARG REDIS_PORT
+ARG JWT_SECRET
+
+# Use the environment variables in the app
+ENV DATABASE_URL=${DATABASE_URL}
+ENV REDIS_HOST=${REDIS_HOST}
+ENV REDIS_PORT=${REDIS_PORT}
+ENV JWT_SECRET=${JWT_SECRET}
+
+# Build and run the app
+RUN yarn build
+
+EXPOSE 5000
+
+CMD ["yarn", "start"]
