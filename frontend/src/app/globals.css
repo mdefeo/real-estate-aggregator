@@ -1,3 +1,21 @@
+/* globals.css */
+
+/* Import Tailwind's default base styles */
+@tailwind base;
+
+/* Import Material UI's global styles (if needed, this could be customized) */
+@tailwind components;
+
+/* Import Tailwind's utility classes */
+@tailwind utilities;
+
+/* You can also add your custom global styles below */
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

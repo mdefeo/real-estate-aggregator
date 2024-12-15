@@ -66,7 +66,7 @@ After setting up the Next.js project, install the necessary dependencies:
 ```bash
 yarn add @mui/material @emotion/react @emotion/styled
 yarn add tailwindcss@latest postcss@latest autoprefixer@latest
-yarn add eslint eslint-define-config @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier prettier eslint-plugin-next --dev
+yarn add eslint eslint-define-config @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier prettier @next/eslint-plugin-next --dev
 ```
 
 ### Set Up Tailwind
@@ -76,17 +76,6 @@ npx tailwindcss init -p
 ```
 
 Update tailwind.config.js and postcss.config.js as needed.
-
-#### Deploy Frontend to Vercel
-
-After setting up the frontend, you can deploy it to Vercel using the command:
-
-```bash
-vercel login # Login
-vercel --prod # Deploy
-```
-
-Vercel will automatically detect the configuration and deploy your project.
 
 ### Backend Setup
 
@@ -119,14 +108,14 @@ psql postgres
 ```
 
 ```sql
-CREATE USER aggregator_user WITH PASSWORD 'sY1-kj5Zhe0yc_aom0ma';
-CREATE DATABASE ra_aggregator_dev;
-CREATE DATABASE ra_aggregator_test;
-CREATE DATABASE ra_aggregator;
+CREATE USER your-user-here WITH PASSWORD 'your-password-here';
+CREATE DATABASE your-dev-db-name-here;
+CREATE DATABASE your-test-db-name-here;
+CREATE DATABASE your-prod-db-name-here;
 
-GRANT ALL PRIVILEGES ON DATABASE ra_aggregator_dev TO aggregator_user;
-GRANT ALL PRIVILEGES ON DATABASE ra_aggregator_test TO aggregator_user;
-GRANT ALL PRIVILEGES ON DATABASE ra_aggregator TO aggregator_user;
+GRANT ALL PRIVILEGES ON DATABASE your-dev-db-name-here TO your-user-here;
+GRANT ALL PRIVILEGES ON DATABASE your-test-db-name-here TO your-user-here;
+GRANT ALL PRIVILEGES ON DATABASE your-prod-db-name-here TO your-user-here;
 
 \q
 ```
@@ -167,21 +156,6 @@ redis.set('listing:123', JSON.stringify({ title: 'Listing 1', price: 100000 }));
 const cachedListing = await redis.get('listing:123');
 ```
 
-#### Heroku Deployment
-
-Create the backend on Heroku:
-
-```bash
-heroku create
-heroku git:remote -a your-app-name
-```
-
-Deploy to Heroku with:
-
-```bash
-git push heroku main
-```
-
 ### Environment Variables
 
 Create a .env file in both the frontend and backend folders to store the necessary environment variables.
@@ -200,3 +174,110 @@ For the frontend, you will need:
 ```txt
 NEXT_PUBLIC_API_URL=http://localhost:5000/api
 ```
+
+### Docker Setup
+
+#### Backend Dockerfile
+
+To build and run the backend in Docker, create a Dockerfile inside the backend folder:
+
+```dockerfile
+# Backend Dockerfile
+FROM node:22.12.0
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+EXPOSE 5000
+
+CMD ["yarn", "start"]
+```
+
+#### Frontend Dockerfile
+
+To build and run the frontend in Docker, create a Dockerfile inside the frontend folder:
+
+```dockerfile
+# Frontend Dockerfile
+FROM node:22.12.0
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+EXPOSE 3000
+
+CMD ["yarn", "start"]
+```
+
+#### Docker Compose
+
+At the parent level, create a docker-compose.yml file to orchestrate the frontend, backend, and database containers:
+
+```yaml
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgres://DB_USER:DB_PASSWORD@db:5432/DB_NAME
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: aggregator_user
+      POSTGRES_PASSWORD: sY1-kj5Zhe0yc_aom0ma
+      POSTGRES_DB: ra_aggregator_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
+    driver: local
+```
+
+## Running the Project with Docker
+
+Run the application with Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+This will build and start the frontend, backend, PostgreSQL, and Redis containers. The frontend will be accessible at <http://localhost:3000>, and the backend at <http://localhost:5000>.
