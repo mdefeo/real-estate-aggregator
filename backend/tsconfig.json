@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "esnext",          // Set target to ESNext for the latest features
+    "module": "esnext",          // Use ESNext module system
+    "lib": ["dom", "dom.iterable", "esnext"], // Include the latest ECMAScript and DOM features
+    "strict": true,              // Enable strict type checking
+    "esModuleInterop": true,     // Ensure compatibility between CommonJS and ES modules
+    "moduleResolution": "node",  // Use Node.js module resolution
+    "resolveJsonModule": true,   // Allow importing JSON files
+    "skipLibCheck": true,        // Skip type checking of declaration files
+    "noEmit": false,             // Allow emitting output (needed for bundling)
+    "outDir": "./dist",          // Output directory for compiled files
+    "baseUrl": "./",             // Set the base directory for non-relative imports
+    "paths": {
+      "@/*": ["src/*"]           // Setup path aliasing for easy imports
+    },
+    "experimentalDecorators": true  // Enable decorators support in TypeScript
+  },
+  "include": [
+    "src/**/*.ts",     // Include TypeScript files in the src folder
+    "test/**/*.ts",     // Include TypeScript test files
+    "main.ts"       // Specifically include main.ts
+
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"             // Exclude the dist folder from the build process
+  ]
+}

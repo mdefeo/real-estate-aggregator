@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-dev-db-name here",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-test-db-name here",
+
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-prod-db-name here",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}

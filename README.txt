@@ -2,12 +2,6 @@
 
 This project is a real estate aggregator application that scrapes property listings from other websites, stores them in a PostgreSQL database, and displays them on a user-friendly dashboard. The application is built using **React** for the frontend, **Next.js** for server-side rendering, **NestJS** (or **Express**) for the backend, **PostgreSQL** as the database, **Sequelize** for ORM, **Redis** for caching, and **Bull** for job queues.
 
-## Stack
-
-- **Frontend**: React/Next.js, Material UI, Tailwind CSS
-- **Backend**: NestJS, Sequelize, PostgreSQL, Redis, Puppeteer, Bull (for job queues)
-- **Deployment**: Vercel (Frontend), Heroku (Backend)
-
 ## Features
 
 - **Real-time property listing aggregation** from multiple external sources.
@@ -48,9 +42,9 @@ Install parent-level modules:
 yarn
 ```
 
-### Frontend Setup
+### Frontend
 
-To set up the frontend, run the following command inside the frontend folder:
+The front end uses React, Next.js, and Material UI. It is deployed to Vercel
 
 #### Create a Next.js project
 
@@ -61,58 +55,36 @@ yarn create next-app . --typescript --use-npm
 
 #### Install Dependencies
 
-After setting up the Next.js project, install the necessary dependencies:
-
 ```bash
-yarn add @mui/material @emotion/react @emotion/styled
-yarn add tailwindcss@latest postcss@latest autoprefixer@latest
-yarn add eslint eslint-define-config @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-prettier prettier eslint-plugin-next --dev
+yarn add react-redux axios @mui/material @emotion/react @emotion/styled
 ```
-
-### Set Up Tailwind
-
-```bash
-npx tailwindcss init -p
-```
-
-Update tailwind.config.js and postcss.config.js as needed.
 
 #### Deploy Frontend to Vercel
 
 After setting up the frontend, you can deploy it to Vercel using the command:
 
 ```bash
-vercel login # Login
-vercel --prod # Deploy
+cd frontend
+vercel login
+vercel --prod
 ```
 
 Vercel will automatically detect the configuration and deploy your project.
 
-### Backend Setup
+### Backend
 
-#### Install NestJS and Setup
+The backend uses Node, NestJS, Sequelize, and Postgres. It is deployed to Heroku.
 
-Navigate to the backend folder and initialize a NestJS project:
+#### Create project and install dependencies
 
 ```bash
-yarn add @nestjs/cli
+yarn global add @nestjs/cli
 nest new backend --package-manager yarn --skip-git
+yarn add express sequelize sequelize-cli pg pg-hstore dotenv bcryptjs jsonwebtoken supertest
+yarn add --dev @babel/parser acorn ts-jest @types/express @types/node @typescript-eslint/parser
 ```
 
-#### Install Backend Dependencies
-
-Install the necessary backend dependencies:
-
-```bash
-yarn add express sequelize pg pg-hstore cors dotenv reflect-metadata
-yarn add @nestjs/common@latest @nestjs/core@latest @nestjs/platform-express@latest
-yarn add typescript@latest @typescript-eslint/eslint-plugin@latest reflect-metadata
-yarn add -D typescript ts-node @types/express @types/node eslint-define-config
-```
-
-#### PostgreSQL Setup
-
-Create a new PostgreSQL user and database for the backend:
+#### Create a PostgreSQL User and Database
 
 ```bash
 psql postgres
@@ -133,70 +105,83 @@ GRANT ALL PRIVILEGES ON DATABASE ra_aggregator TO aggregator_user;
 
 #### Sequelize Setup
 
-Initialize Sequelize and generate models:
+Configure Sequelize in config/config.json for all environments. Rename the config.json.example file to config.json and fill in the variables.
+
+```json
+{
+  "development": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-dev-db-name here",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-test-db-name here",
+
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "your-user-here",
+    "password": "your-password-here",
+    "database": "your-prod-db-name here",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
+```
+
+#### Run the migration
 
 ```bash
 yarn sequelize init
 yarn sequelize model:generate --name Listing --attributes title:string,price:float,location:string
-```
-
-Run migration:
-
-```bash
 yarn sequelize db:migrate
 ```
 
-#### Scraping and Queues Setup
+#### Queue and Scraping Setup
 
-Install Puppeteer, Cheerio, Bull, and Redis for scraping and queues:
+##### Install Dependencies for Puppeteer and Bull
 
 ```bash
-yarn add puppeteer cheerio axios
-yarn add bull ioredis
-yarn add -D @types/bull
+yarn add puppeteer cheerio axios bull ioredis
 ```
 
-#### Redis Setup
+#### Caching with Redis
 
-Set up Redis caching and configure Redis connections:
+##### Install Redis
 
-```tsx
-import Redis from 'ioredis';
-const redis = new Redis();
-redis.set('listing:123', JSON.stringify({ title: 'Listing 1', price: 100000 }));
-const cachedListing = await redis.get('listing:123');
+```bash
+yarn add redis ioredis
 ```
 
-#### Heroku Deployment
-
-Create the backend on Heroku:
+### Deploy Backend to Heroku
 
 ```bash
 heroku create
-heroku git:remote -a your-app-name
+git push heroku master
 ```
 
-Deploy to Heroku with:
+#### Environment Variables
 
-```bash
-git push heroku main
+Make sure you set the following environment variables in Heroku for your production environment:
+
+```text
+DATABASE_URL
+REDIS_URL (if using Redis)
 ```
 
-### Environment Variables
+## Notes
 
-Create a .env file in both the frontend and backend folders to store the necessary environment variables.
+Ensure you have Redis running on your local machine for caching.
+Ensure your PostgreSQL instance is running and the connection is properly configured.
+Job queues (via Bull) handle background tasks like scraping and processing listings.
 
-For the backend, you will need:
+## Final Recommendations
 
-```txt
-DATABASE_URL=postgres://DB_USER:DB_PASSWORD@localhost:5432/DB_NAME
-REDIS_HOST=localhost
-REDIS_PORT=6379
-JWT_SECRET=your_jwt_secret
-```
-
-For the frontend, you will need:
-
-```txt
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
+1. **Section Titles**: Ensure all section titles (e.g., "Frontend Setup", "Backend Setup") are clearly separated for readability.
+2. **Consistent Formatting**: Keep code blocks consistent throughout the README, especially for installation commands, code examples, and configurations.
+3. **Detailed Steps**: Make sure each step is numbered and explained clearly for ease of use by others.

@@ -81,7 +81,6 @@ web_modules/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
-.parcel-cache
 
 # Next.js build output
 .next
@@ -128,3 +127,18 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Frontend build output
+.next/
+out/
+.parcel-cache/
+.cache/
+
+# Backend build output
+dist/
+
+# IDE/Editor
+.vscode/
+
+# OS-specific files
+.DS_Store
