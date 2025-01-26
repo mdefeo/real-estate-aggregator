@@ -20,5 +20,8 @@
     "test:watch": "jest --watch",
     "lint:fix": "eslint --fix",
     "format": "prettier --write 'frontend/**/*.ts' 'backend/**/*.ts' --write"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.4"
   }
 }

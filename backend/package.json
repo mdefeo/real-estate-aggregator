@@ -21,7 +21,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:unit": "jest --coverage --runInBand --testRegex \".*\\.spec\\.ts$\"",
-    "test:integration": "jest --coverage --runInBand --testRegex \".*\\.integration\\.ts$\""
+    "test:integration": "jest --coverage --runInBand --testRegex \".*\\.integration\\.ts$\"",
+    "sequelize:init": "dotenv -e .env.development sequelize init",
+    "sequelize:generate": "dotenv -e .env.development sequelize model:generate --name Listing --attributes title:string,price:float,location:string",
+    "sequelize:migrate": "dotenv -e .env.development sequelize db:migrate",
+    "db:migrate": "sequelize db:migrate --url postgres://$DB_USER:$DB_PASSWORD@$DB_HOST:5432/$DB_NAME"
   },
   "dependencies": {
     "@nestjs/common": "^10.4.15",
@@ -32,6 +36,7 @@
     "axios": "^1.7.9",
     "bull": "^4.16.4",
     "cheerio": "^1.0.0",
+    "dotenv": "^16.4.7",
     "ioredis": "^5.4.1",
     "pg": "^8.13.1",
     "pg-hstore": "^2.3.4",
@@ -53,7 +58,7 @@
     "@types/supertest": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.18.0",
     "@typescript-eslint/parser": "^8.18.0",
-    "dotenv": "^10.0.0",
+    "dotenv-cli": "^7.4.4",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-define-config": "^2.1.0",
